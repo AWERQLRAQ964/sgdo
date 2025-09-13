@@ -78,4 +78,50 @@ Tab:AddButton({
             end
         end
     end
+
 })
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+
+-- زر لفتح قائمة اللاعبين
+local openButton = Instance.new("TextButton", gui)
+openButton.Size = UDim2.new(0,150,0,50)
+openButton.Position = UDim2.new(0,10,0,10)
+openButton.Text = "Players List"
+
+-- إطار للاعبين
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,200,0,300)
+frame.Position = UDim2.new(0,10,0,70)
+frame.Visible = false
+
+openButton.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+end)
+
+-- تحديث قائمة اللاعبين
+local function updatePlayers()
+    frame:ClearAllChildren()
+    for i, plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= player then
+            local btn = Instance.new("TextButton", frame)
+            btn.Size = UDim2.new(1,0,0,30)
+            btn.Position = UDim2.new(0,0,0,(i-1)*35)
+            btn.Text = plr.Name
+
+            btn.MouseButton1Click:Connect(function()
+                -- نقل اللاعب إليك
+                if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    player.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + Vector3.new(0,5,0)
+                end
+            end)
+        end
+    end
+end
+
+-- حدث لإعادة تحديث القائمة عند دخول لاعب جديد
+game.Players.PlayerAdded:Connect(updatePlayers)
+game.Players.PlayerRemoving:Connect(updatePlayers)
+
+-- التحديث الأولي
+updatePlayers()
