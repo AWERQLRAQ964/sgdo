@@ -125,3 +125,43 @@ game.Players.PlayerRemoving:Connect(updatePlayers)
 
 -- التحديث الأولي
 updatePlayers()
+
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+
+-- زر لاختيار الأغنية
+local songButton = Instance.new("TextButton", gui)
+songButton.Size = UDim2.new(0,200,0,50)
+songButton.Position = UDim2.new(0,10,0,10)
+songButton.Text = "Play Song"
+
+-- إطار للاختيار
+local songId = "rbxassetid://معرف_الأغنية" -- استبدل بالـ ID الخاص بالأغنية
+local startTime = 30  -- وقت البداية بالثواني
+local endTime = 60    -- وقت النهاية بالثواني
+
+local function playSongForAll()
+    -- نحذف أي صوت موجود سابقًا
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj:IsA("Sound") and obj.Name == "GlobalSong" then
+            obj:Destroy()
+        end
+    end
+
+    -- نضيف الصوت للـ workspace
+    local sound = Instance.new("Sound", workspace)
+    sound.Name = "GlobalSong"
+    sound.SoundId = songId
+    sound.Looped = true
+    sound.TimePosition = startTime
+    sound:Play()
+
+    -- نعمل تحديث وقت النهاية
+    sound:GetPropertyChangedSignal("TimePosition"):Connect(function()
+        if sound.TimePosition >= endTime then
+            sound.TimePosition = startTime
+        end
+    end)
+end
+
+songButton.MouseButton1Click:Connect(playSongForAll)
